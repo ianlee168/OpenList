@@ -1,5 +1,5 @@
 // Credits: https://pkg.go.dev/github.com/rclone/rclone@v1.65.2/cmd/serve/s3
-// Package s3 implements a fake s3 server for alist
+// Package s3 implements a fake s3 server for openlist
 package s3
 
 import (
@@ -21,7 +21,7 @@ import (
 	"github.com/OpenListTeam/OpenList/internal/stream"
 	"github.com/OpenListTeam/OpenList/pkg/http_range"
 	"github.com/OpenListTeam/OpenList/pkg/utils"
-	"github.com/alist-org/gofakes3"
+	"github.com/itsHenry35/gofakes3"
 	"github.com/ncw/swift/v2"
 	log "github.com/sirupsen/logrus"
 )
@@ -213,8 +213,9 @@ func (b *s3Backend) GetObject(ctx context.Context, bucketName, objectName string
 	}
 
 	meta := map[string]string{
-		"Last-Modified": node.ModTime().Format(timeFormat),
-		"Content-Type":  utils.GetMimeType(fp),
+		"Last-Modified":       node.ModTime().Format(timeFormat),
+		"Content-Disposition": utils.GenerateContentDisposition(file.GetName()),
+		"Content-Type":        utils.GetMimeType(fp),
 	}
 
 	if val, ok := b.meta.Load(fp); ok {
@@ -328,7 +329,7 @@ func (b *s3Backend) PutObject(
 func (b *s3Backend) DeleteMulti(ctx context.Context, bucketName string, objects ...string) (result gofakes3.MultiDeleteResult, rerr error) {
 	for _, object := range objects {
 		if err := b.deleteObject(ctx, bucketName, object); err != nil {
-			utils.Log.Errorf("serve s3", "delete object failed: %v", err)
+			log.Errorf("delete object failed: %v", err)
 			result.Error = append(result.Error, gofakes3.ErrorResult{
 				Code:    gofakes3.ErrInternal,
 				Message: gofakes3.ErrInternal.Message(),

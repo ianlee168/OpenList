@@ -1,5 +1,5 @@
 // Credits: https://pkg.go.dev/github.com/rclone/rclone@v1.65.2/cmd/serve/s3
-// Package s3 implements a fake s3 server for alist
+// Package s3 implements a fake s3 server for openlist
 package s3
 
 import (
@@ -13,13 +13,15 @@ import (
 	"github.com/OpenListTeam/OpenList/internal/model"
 	"github.com/OpenListTeam/OpenList/internal/op"
 	"github.com/OpenListTeam/OpenList/internal/setting"
-	"github.com/alist-org/gofakes3"
+	"github.com/itsHenry35/gofakes3"
 )
 
 type Bucket struct {
 	Name string `json:"name"`
 	Path string `json:"path"`
 }
+
+const emptyObjectName = "ThisIsAnEmptyFolderInTheS3Bucket"
 
 func getAndParseBuckets() ([]Bucket, error) {
 	var res []Bucket
